@@ -4,6 +4,8 @@ import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:sqflite/sqflite.dart';
 
+import 'ClientModel.dart';
+
 class DBProvider {
   DBProvider._();
   static final DBProvider db = DBProvider._();
@@ -28,6 +30,17 @@ class DBProvider {
           "blocked BTI"
           ");");
     });
+  }
+
+  newClient(Client newClient) async {
+    final db = await database;
+    var table = await db.rawQuery("SELECT MAX(id)+1 as id FROM Client;");
+    int id = table.first["id"];
+    var raw = await db.rawInsert(
+        "INSERT Into Client (id, first_name, last_name, blocked)"
+        " VALUES (?, ?, ?, ?)",
+        [id, newClient.firstName, newClient.lastName, newClient.blocked]);
+    return raw;
   }
 
 
